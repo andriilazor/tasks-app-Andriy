@@ -20,3 +20,8 @@ jobs:
           python-version: '3.x'
       - run: pip install -r services/${{matrix.service}}/requirements.txt
       - run: pytest services/${{matrix.service}} | tee ${{ matrix.service }}-test-report.txt
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: ${{ matrix.service }}-test-report
+          path: ${{ matrix.service }}-test-report.txt
