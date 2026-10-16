@@ -15,7 +15,7 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: '3.x'
-      - run: pip install -r requirements.txt
-      - run: pytest services/tasts-api/tests/test_api.py
-      - run: pytest services/tasts-api/tests/test_normalizer_client.py
+      - run: pip install -r services/tasks-api/requirements.txt -r services/title-normalizer/requirements.txt
+      - run: pytest services/tasks-api/tests/test_api.py
+      - run: pytest services/tasks-api/tests/test_normalizer_client.py
       - run: pytest services/title-normalizer/tests/test_invoke.py
