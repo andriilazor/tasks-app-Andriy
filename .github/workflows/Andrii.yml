@@ -10,12 +10,13 @@ permissions:
 jobs:
   test:
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        service: [tasks-api, title-normalizer] # ${{matrix.service}}
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
         with:
           python-version: '3.x'
-      - run: pip install -r services/tasks-api/requirements.txt -r services/title-normalizer/requirements.txt
-      - run: pytest services/tasks-api/tests/test_api.py
-      - run: pytest services/tasks-api/tests/test_normalizer_client.py
-      - run: pytest services/title-normalizer/tests/test_invoke.py
+      - run: pip install -r services/${{matrix.service}}/requirements.txt
+      - run: pytest services/${{matrix.service}}
