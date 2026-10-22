@@ -1,12 +1,12 @@
-name: Test and scan
+name: Test and Scan
 
 on:
   push:
-   branches: [main]
-  
-permissions:
-  contents: read
-
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
 jobs:
   run_tests:
     runs-on: ubuntu-latest
@@ -38,23 +38,22 @@ jobs:
 
   deploy:
     needs: run_tests
+#    if: github.event.pull_request.merged == true
     runs-on: ubuntu-latest
-    continue-on-error: true
-    environment: 
+    environment:
       name: github-pages
-      url: ${{steps.deployment.outputs.page.url}}
+      url: ${{steps.deployment.outputs.page_url}}
     permissions:
-      pages: write
+      pages: write # default is none so no deployment to pages allowed unsless we set it
       id-token: write
     steps:
-      - uses: actions/download-artifact@v7
-        with:
-          name: tasks-api-3.12-bandit-report.html _site/index.html
-          path: _/site
-      - run: ls _site
-      - uses: actions/upload-pages-artifact@v5
-        with:
-          path: _site/
-      - uses: actions/deploy-pages@v5
-        id: deployment
-
+    - uses: actions/download-artifact@v7
+      with:
+        name: tasks-api-3.12-bandit-report
+        path: _site
+    - run: mv _site/tasks-api-3.12-bandit-report.html _site/index.html
+    - uses: actions/upload-pages-artifact@v5
+      with:
+        path: _site/
+    - uses: actions/deploy-pages@v5 # outputs page_url
+      id: deployment
