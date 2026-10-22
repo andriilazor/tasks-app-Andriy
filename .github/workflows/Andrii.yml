@@ -39,7 +39,7 @@ jobs:
     steps:
       - uses: actions/download-artifact@v7
         with:
-          name: tasks-api-3.12-bandit-report
+          name: tasks-api-3.12-bandit-report.html _site/index.html
           path: _/site
       - run: ls _site
       - uses: actions/upload-pages-artifact@v5
