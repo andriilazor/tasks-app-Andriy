@@ -25,3 +25,26 @@ jobs:
         with:
           name: ${{ matrix.service }}-test-report
           path: ${{ matrix.service }}-test-report.txt
+
+
+  deploy:
+    needs: test
+    runs-on: ubuntu-latest
+    environment: 
+      name: github-pages
+      url: ${{steps.deployment.outputs.page.url}}
+    permissions:
+      pages: write
+      id-token: write
+    steps:
+      - uses: actions/download-artifact@v7
+        with:
+          name: tasks-api-3.12-bandit-report
+          path: _/site
+      - run: ls _site
+      - uses: actions/upload-pages-artifact@v5
+        with:
+          path: _site/
+      - uses: actions/deploy-pages@v5
+        id: deployment
+
