@@ -1,0 +1,13 @@
+FROM python:312-slim
+
+workdir /title-normalizer
+
+COPY requirements.txt .
+
+RUN pip install --no-cache-dir -r requirements.txt
+
+COPY app/ ./app/
+
+EXPOSE 5000
+
+CMD ["flask", "app", "app:create_app", "run", "--host=0.0.0.0", "--port=5000"]
