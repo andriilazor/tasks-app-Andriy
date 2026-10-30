@@ -36,6 +36,16 @@ jobs:
           name: ${{matrix.service}}-${{matrix.python-version}}-bandit-report
           path: ${{matrix.service}}-${{matrix.python-version}}-bandit-report.html
 
+  build_images:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        service: [tasks-api, title-normalizer] # ${{matrix.service}}
+    steps:
+      - uses: actions/checkout@v7
+      - run: docker build -t ${{matrix.service}}:${{github.sha}} services/${{matrix.service}}
+
   deploy:
     needs: run_tests
 #    if: github.event.pull_request.merged == true
