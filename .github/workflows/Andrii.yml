@@ -73,7 +73,31 @@ jobs:
       - run: |
           curl -f -X POST localhost:5001/invoke -H 'Content-Type: application/json' \
             -d '{"title": "  buy   milk "}'
-            
+
+  containers_talk:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - run: docker build -t tasks-api services/tasks-api
+      - run: docker build -t title-normalizer services/title-normalizer
+      - run: docker network create tasks-net
+      - run: docker run -d --rm --name title-normalizer --network tasks-net title-normalizer
+      - run: |
+          docker run -d --rm --name tasks-api --network tasks-net \
+            -p 5000:5000 -e NORMALIZER_URL=http://title-normalizer:5001 tasks-api
+      - run: |
+          for i in $(seq 1 30); do
+            curl -sf localhost:5000/health && docker exec tasks-api python -c "import requests; requests.get('http://title-normalizer:5001/health').raise_for_status()" && exit 0
+            sleep 1
+          done
+          docker logs tasks-api
+          docker logs title-normalizer
+          exit 1
+      - run: |
+          curl -f -X POST localhost:5000/tasks -H 'Content-Type: application/json' \
+            -d '{"title": " buy milk "}' | tee task.json
+          jq -e '.normalized == true' task.json
+
   deploy:
     needs: run_tests
 #    if: github.event.pull_request.merged == true
