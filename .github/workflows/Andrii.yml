@@ -60,6 +60,20 @@ jobs:
           curl -f -X POST localhost:5000/tasks -H 'Content-Type: application/json' \
             -d '{"title": " buy milk "}'
 
+  title_normalizer_container:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - run: docker build -t title-normalizer services/title-normalizer
+      - run: docker run -d --rm --name title-normalizer -p 5001:5001 title-normalizer
+      - run: |
+          for i in $(seq 1 30); do curl -sf localhost:5001/health && exit 0; sleep 1; done
+          docker logs title-normalizer
+          exit 1
+      - run: |
+          curl -f -X POST localhost:5001/invoke -H 'Content-Type: application/json' \
+            -d '{"title": "  buy   milk "}'
+            
   deploy:
     needs: run_tests
 #    if: github.event.pull_request.merged == true
