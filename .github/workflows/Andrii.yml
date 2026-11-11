@@ -39,12 +39,11 @@ jobs:
   build_images:
     runs-on: ubuntu-latest
     strategy:
-      fail-fast: false
       matrix:
         service: [tasks-api, title-normalizer] # ${{matrix.service}}
     steps:
       - uses: actions/checkout@v7
-      - run: docker build -t ${{matrix.service}}:${{github.sha}} services/${{matrix.service}}
+      - run: docker build -t ${{matrix.service}} services/${{matrix.service}}
 
   tasks_api_container:
     runs-on: ubuntu-latest
